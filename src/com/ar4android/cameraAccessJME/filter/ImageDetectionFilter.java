@@ -33,7 +33,7 @@ import android.content.Intent;
 import android.nfc.Tag;
 import android.util.Log;
 
-public final class ImageDetectionFilter {
+public final class ImageDetectionFilter{
 	
 	// Flag for debug.
 	private String Tag = "ImageDetectionFilter";
@@ -100,7 +100,7 @@ public final class ImageDetectionFilter {
     private final MatOfDouble mRotation =
     new MatOfDouble();
     // The OpenGL pose matrix of the detected target.
-    private final float[] mGLPose = new float[16];
+    private final float[] mGLPose = new float[12];
     
     // Whether the target is currently detected.
     private boolean mTargetFound = false;
@@ -310,23 +310,34 @@ public final class ImageDetectionFilter {
         Calib3d.solvePnP(mReferenceCorners3D, mSceneCorners2D,
                 projection, mDistCoeffs, mRVec, mTVec);
         
-     // Positive y is up in OpenGL, down in OpenCV.
-        // Positive z is backward in OpenGL, forward in OpenCV.
-        // Positive angles are counter-clockwise in OpenGL,
-        // clockwise in OpenCV.
-        // Thus, x angles are negated but y and z angles are
-        // double-negated (that is, unchanged).
-        // Meanwhile, y and z positions are negated.
-        
-        final double[] rVecArray = mRVec.toArray();
-        rVecArray[0] *= -1.0; // negate x angle
+        // mRVec 旋轉矩陣
+        final double[] rVecArray = mRVec.toArray(); 
+        rVecArray[0] *= -1.0;
         mRVec.fromArray(rVecArray);
         
         // Convert the Euler angles to a 3x3 rotation matrix.
         Calib3d.Rodrigues(mRVec, mRotation);
         
+        
+         // mTVec 平移矩陣
         final double[] tVecArray = mTVec.toArray();
-
+        
+        
+        // 透過 旋轉、平移矩陣 描述 辨識物姿態
+        mGLPose[0] = (float)mRotation.get(0, 0)[0];
+        mGLPose[1] = (float)mRotation.get(0, 1)[0];
+        mGLPose[2] = (float)mRotation.get(0, 2)[0];
+        mGLPose[3] = (float)mRotation.get(1, 0)[0];
+        mGLPose[4] = (float)mRotation.get(1, 1)[0];
+        mGLPose[5] = (float)mRotation.get(1, 2)[0];
+        mGLPose[6] = (float)mRotation.get(2, 0)[0];
+        mGLPose[7] = (float)mRotation.get(2, 1)[0];
+        mGLPose[8] = (float)mRotation.get(2, 2)[0];
+        mGLPose[9] =  (float)tVecArray[0];
+        mGLPose[10] = -(float)tVecArray[1]; // negate y position
+        mGLPose[11] = -(float)tVecArray[2]; // negate z position
+        
+        
         mTargetFound = true;
 
 	}
@@ -365,6 +376,7 @@ public final class ImageDetectionFilter {
 	public float[] getGLPose() {
 		// TODO Auto-generated method stub
 		return (mTargetFound ? mGLPose : null);
+		
 	}
 	
 	

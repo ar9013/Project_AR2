@@ -11,11 +11,12 @@ package com.ar4android.cameraAccessJME;
 
 
 
+import android.renderscript.Matrix3f;
+import android.transition.Scene;
 import android.util.Log;
 
 import org.opencv.core.MatOfDouble;
 
-import com.ar4android.cameraAccessJME.filter.ARFilter;
 import com.ar4android.cameraAccessJME.filter.ImageDetectionFilter;
 import com.jme3.animation.AnimChannel;
 import com.jme3.animation.AnimControl;
@@ -33,13 +34,20 @@ import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import com.jme3.scene.Spatial.CullHint;
 import com.jme3.scene.shape.Quad;
 import com.jme3.texture.Image;
 import com.jme3.texture.Texture2D;
 
 
+
 public class CameraAccessJME extends SimpleApplication implements AnimEventListener{
 
+	public ImageDetectionFilter filter;
+	float[] pose = new float[12];;
+	boolean targetFound ;
+	 Node vault = new Node("vault"); 
+	
 	private static final String TAG = "CameraAccessJME";
 	// The geometry which will represent the video background
 	private Geometry mVideoBGGeom;
@@ -61,9 +69,9 @@ public class CameraAccessJME extends SimpleApplication implements AnimEventListe
 	int mWidthPx = 640;
 	float fgCamNear = 10f;
 	float fgCamFar = 1000f;
-	
-	private ImageDetectionFilter filter ;
-	
+
+	Spatial ninja;
+	Node nodeNinja = new Node();
 	
 	// for animation	
 		// The controller allows access to the animation sequences of the model
@@ -88,19 +96,9 @@ public class CameraAccessJME extends SimpleApplication implements AnimEventListe
 		
 		initVideoBackground(settings.getWidth(), settings.getHeight());
 		initBackgroundCamera();
+		initForegroundScene();			
+		initForegroundCamera(fgCamFOVY);
 		
-		
-		
-		
-			initForegroundScene();			
-			initForegroundCamera(fgCamFOVY);
-		
-	
-		
-	
-		
-	//	Log.d(TAG, "isTargetFound : "+filter.getFlagTargetFound());
-	
 	}
 
 	// This function creates the geometry, the viewport and the virtual camera
@@ -146,33 +144,34 @@ public class CameraAccessJME extends SimpleApplication implements AnimEventListe
 	}
 	
 	public void initForegroundScene() {
-		Node inventory = new Node("Inventory");
-		
 		// Load a model from test_data (OgreXML + material + texture)
-        Spatial ninja = assetManager.loadModel("Models/Ninja/Ninja.mesh.xml");
-        ninja.scale(0.025f, 0.025f, 0.025f);
-        ninja.rotate(0.0f, -3.0f, 0.0f);
-        ninja.setLocalTranslation(0.0f, -2.5f, 0.0f);
-        rootNode.attachChild(ninja);
-        
-        // You must add a light to make the model visible
-        DirectionalLight sun = new DirectionalLight();
-        sun.setDirection(new Vector3f(-0.1f, -0.7f, -1.0f));
-        rootNode.addLight(sun);
-	
-        mAniControl = ninja.getControl(AnimControl.class);
-        mAniControl.addListener(this);
-        mAniChannel = mAniControl.createChannel();
-        // show animation from beginning
-        mAniChannel.setAnim("Walk");
-        mAniChannel.setLoopMode(LoopMode.Loop);
-        mAniChannel.setSpeed(1f);
-        
-        
-        rootNode.attachChild(ninja);
-        rootNode.addLight(sun);
-        
+		ninja  = assetManager.loadModel("Models/Ninja/Ninja.mesh.xml");
 		
+    	DirectionalLight sun = new DirectionalLight();
+
+            ninja.scale(0.025f, 0.025f, 0.025f);
+            ninja.rotate(0.0f, -3.0f, 0.0f);
+            ninja.setLocalTranslation(0.0f, -2.5f, 0.0f);
+            
+            // You must add a light to make the model visible
+            sun.setDirection(new Vector3f(-0.1f, -0.7f, -1.0f));
+            mAniControl = ninja.getControl(AnimControl.class);
+            mAniControl.addListener(this);
+            mAniChannel = mAniControl.createChannel();
+            // show animation from beginning
+            mAniChannel.setAnim("Walk");
+            mAniChannel.setLoopMode(LoopMode.Loop);
+            mAniChannel.setSpeed(1f);
+            
+           
+            nodeNinja.attachChild(ninja);
+            nodeNinja.addLight(sun);
+            
+            
+            
+        	rootNode.attachChild(nodeNinja);
+        	
+        
 	}
 	
 	public void initForegroundCamera(float fovY) {
@@ -190,10 +189,9 @@ public class CameraAccessJME extends SimpleApplication implements AnimEventListe
 		
 		final float top = right / getAspectRatio();
 		
-		fgCam.setFrustum(fgCamNear, fgCamFar, -right, right, top, -top);
-		
-		
-
+		// set Frustum
+		fgCam.setFrustum(fgCamNear, fgCamFar, -right, right, top, -top); 
+	
 		//fgCam.setFrustumPerspective(fovY,  getAspectRatio() , fgCamNear, fgCamFar);
 		
 		
@@ -222,6 +220,21 @@ public class CameraAccessJME extends SimpleApplication implements AnimEventListe
 			mvideoBGMat.setTexture("ColorMap", mCameraTexture);
 			mNewCameraFrameAvailable = false;
 		}
+		
+		
+		if(targetFound){
+		
+			// 更新角色得部份有問題。
+			//ninja.setLocalTranslation(pose[9], pose[10], pose[11]);
+			//com.jme3.math.Matrix3f rotation = new com.jme3.math.Matrix3f(pose[0], pose[1], pose[2], pose[3], pose[4], pose[5], pose[6], pose[7], pose[8]);
+			//ninja.setLocalRotation(rotation);
+			
+			ninja.setCullHint(CullHint.Never);
+
+		}else{
+			ninja.setCullHint(CullHint.Always);
+		}
+		
 		// we have to update the video background node before the root node gets updated by the super class
 		mVideoBGGeom.updateLogicalState(tpf);
 		mVideoBGGeom.updateGeometricState();
@@ -242,4 +255,17 @@ public class CameraAccessJME extends SimpleApplication implements AnimEventListe
 	public float getAspectRatio() {
 		return (float)mWidthPx / (float)mHeightPx;
 		}
+
+
+	public void setARFilter(ImageDetectionFilter arFilter) {
+		filter = arFilter;
+		targetFound =filter.getFlagTargetFound();
+		
+//		if(targetFound){
+//		pose = filter.getGLPose();
+//		com.jme3.math.Matrix3f rotation = new com.jme3.math.Matrix3f(pose[0], pose[1], pose[2], pose[3], pose[4], pose[5], pose[6], pose[7], pose[8]);
+//		ninja.setLocalRotation(rotation);
+//        ninja.setLocalTranslation(pose[9], pose[10], pose[11]);
+//		}
+	}
 }

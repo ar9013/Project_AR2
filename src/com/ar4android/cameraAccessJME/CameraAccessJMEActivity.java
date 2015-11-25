@@ -43,14 +43,13 @@ import android.view.ViewGroup;
 import com.jme3.system.android.AndroidConfigChooser.ConfigType;
 import com.jme3.texture.Image;
 
-
 public class CameraAccessJMEActivity extends AndroidHarness {
 
 	private static final String TAG = "CameraAccessJMEActivity";
 	private Camera mCamera;
 	private CameraPreview mPreview;
 	private int mDesiredCameraPreviewWidth = 640;
-	Size sizex ;
+	Size sizex;
 
 	private byte[] mPreviewBufferRGB565 = null;
 
@@ -73,23 +72,20 @@ public class CameraAccessJMEActivity extends AndroidHarness {
 
 	// (OpenCV) FlagDraw
 	private boolean isTargetFound;
-	
+
 	// An adapter between the video camera and projection matrix.
-    private CameraProjectionAdapter mCameraProjectionAdapter =  new CameraProjectionAdapter();
+	private CameraProjectionAdapter mCameraProjectionAdapter = new CameraProjectionAdapter();
 
 	private BaseLoaderCallback mOpenCVCallBack = new BaseLoaderCallback(this) {
 		public void onManagerConnected(int status) {
 			switch (status) {
 			case LoaderCallbackInterface.SUCCESS:
 				Log.d(TAG, "OpenCV loaded successfully");
-				
-				
 
 				final ImageDetectionFilter Marker_fireworks;
 				try {
 					// Define The fireworks image to be 1.0 units tall.
-					Marker_fireworks = new ImageDetectionFilter(CameraAccessJMEActivity.this, 
-							R.drawable.fireworks,
+					Marker_fireworks = new ImageDetectionFilter(CameraAccessJMEActivity.this, R.drawable.fireworks,
 							mCameraProjectionAdapter, 1.0);
 				} catch (IOException e) {
 					Log.e(TAG, "Failed to load drawable: " + "Marker_fireworks");
@@ -99,8 +95,7 @@ public class CameraAccessJMEActivity extends AndroidHarness {
 
 				final ImageDetectionFilter Marker_pukeko;
 				try {
-					Marker_pukeko = new ImageDetectionFilter(CameraAccessJMEActivity.this, 
-							R.drawable.pukeko,
+					Marker_pukeko = new ImageDetectionFilter(CameraAccessJMEActivity.this, R.drawable.pukeko,
 							mCameraProjectionAdapter, 1.0);
 				} catch (IOException e) {
 					Log.e(TAG, "Failed to load drawable: " + "Marker_pukeko");
@@ -110,8 +105,7 @@ public class CameraAccessJMEActivity extends AndroidHarness {
 
 				final ImageDetectionFilter Marker_mini;
 				try {
-					Marker_mini = new ImageDetectionFilter(CameraAccessJMEActivity.this, 
-							R.drawable.mini,
+					Marker_mini = new ImageDetectionFilter(CameraAccessJMEActivity.this, R.drawable.mini,
 							mCameraProjectionAdapter, 1.0);
 				} catch (IOException e) {
 					Log.e(TAG, "Failed to load drawable: " + "Marker_mini");
@@ -145,6 +139,9 @@ public class CameraAccessJMEActivity extends AndroidHarness {
 
 				if ((com.ar4android.cameraAccessJME.CameraAccessJME) app != null) {
 					((com.ar4android.cameraAccessJME.CameraAccessJME) app).setTexture(cameraJMEImageRGB565);
+					((com.ar4android.cameraAccessJME.CameraAccessJME) app)
+							.setARFilter(mImageDetectionFilters[mImageDetectionFilterIndex]);
+
 				}
 			}
 		}
@@ -171,29 +168,24 @@ public class CameraAccessJMEActivity extends AndroidHarness {
 		Camera.Parameters parameters = mCamera.getParameters();
 		// Get a list of supported preview sizes.
 		List<Camera.Size> sizes = parameters.getSupportedPreviewSizes();
-	int currentWidth = 0;
-	int currentHeight = 0;
+		int currentWidth = 0;
+		int currentHeight = 0;
 		boolean foundDesiredWidth = false;
 		for (Camera.Size size : sizes) {
 			if (size.width == mDesiredCameraPreviewWidth) {
 				currentWidth = size.width;
 				currentHeight = size.height;
 				foundDesiredWidth = true;
-				sizex= size;
+				sizex = size;
 				break;
 			}
 		}
-		
-		
-		
-		
-		
+
 		if (foundDesiredWidth) {
-			
+
 			parameters.setPreviewSize(currentWidth, currentHeight);
-			mCameraProjectionAdapter.setCameraParameters(
-	                parameters, sizex);
-			
+			mCameraProjectionAdapter.setCameraParameters(parameters, sizex);
+
 		}
 		mCamera.setParameters(parameters);
 	}
@@ -312,13 +304,7 @@ public class CameraAccessJMEActivity extends AndroidHarness {
 
 		mImageDetectionFilters[0].apply(mRgba, mRgba);
 		isTargetFound = mImageDetectionFilters[0].getFlagTargetFound();
-		
+		Log.d(TAG, "isTargetFound : " + isTargetFound);
 	}
-	
-	public boolean getTargetFound(){
-		return isTargetFound;
-	}
-	
-	
 
 }
