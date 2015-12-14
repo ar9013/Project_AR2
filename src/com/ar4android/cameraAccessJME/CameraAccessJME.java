@@ -223,11 +223,11 @@ public class CameraAccessJME extends SimpleApplication implements AnimEventListe
 		
 		
 		if(targetFound){
-		
-			// 更新角色得部份有問題。
-			//ninja.setLocalTranslation(pose[9], pose[10], pose[11]);
-			//com.jme3.math.Matrix3f rotation = new com.jme3.math.Matrix3f(pose[0], pose[1], pose[2], pose[3], pose[4], pose[5], pose[6], pose[7], pose[8]);
-			//ninja.setLocalRotation(rotation);
+			// 更新角色部份有問題
+			ninja.setLocalTranslation(pose[9], pose[10], pose[11]);
+			com.jme3.math.Matrix3f rotation = new com.jme3.math.Matrix3f(pose[0], pose[1], pose[2], pose[3], pose[4], pose[5], pose[6], pose[7], pose[8]);
+			ninja.setLocalRotation(rotation);
+			
 			
 			ninja.setCullHint(CullHint.Never);
 

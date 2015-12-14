@@ -333,7 +333,7 @@ public final class ImageDetectionFilter{
         mGLPose[6] = (float)mRotation.get(2, 0)[0];
         mGLPose[7] = (float)mRotation.get(2, 1)[0];
         mGLPose[8] = (float)mRotation.get(2, 2)[0];
-        mGLPose[9] =  (float)tVecArray[0];
+        mGLPose[9] =   (float)tVecArray[0];
         mGLPose[10] = -(float)tVecArray[1]; // negate y position
         mGLPose[11] = -(float)tVecArray[2]; // negate z position
         
