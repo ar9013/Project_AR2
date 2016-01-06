@@ -85,7 +85,7 @@ public final class ImageDetectionFilter{
 	byte[] dstByteArray = null;
 
 	// Distortion coefficients of the camera's lens.
-    // Assume no distortion.
+    // Assume no distortion. 假設沒有變形
     private final MatOfDouble mDistCoeffs = new MatOfDouble(
             0.0, 0.0, 0.0, 0.0);
 	
@@ -312,6 +312,7 @@ public final class ImageDetectionFilter{
         
         // mRVec 旋轉矩陣
         final double[] rVecArray = mRVec.toArray(); 
+  
         rVecArray[0] *= -1.0;
         mRVec.fromArray(rVecArray);
         
@@ -336,9 +337,10 @@ public final class ImageDetectionFilter{
         mGLPose[9] =   (float)tVecArray[0];
         mGLPose[10] = -(float)tVecArray[1]; // negate y position
         mGLPose[11] = -(float)tVecArray[2]; // negate z position
-        
-        
+      
+       
         mTargetFound = true;
+        
 
 	}
 

@@ -52,6 +52,7 @@ public class CameraProjectionAdapter {
 		// FOV values reported by Camera.Parameters. This is not
 		// necessarily the same as the image's current aspect
 		// ratio, which might be a crop mode.
+			
 		final float fovAspectRatio = mFOVX / mFOVY;
 		double diagonalPx = Math.sqrt(
 				(Math.pow(mWidthPx, 2.0) +
