@@ -221,17 +221,18 @@ public class CameraAccessJME extends SimpleApplication implements AnimEventListe
 			mNewCameraFrameAvailable = false;
 		}
 		
-		
+	
 		if(targetFound){
-			// 更新角色部份有問題
+			// 角色更新的參數有問題。
+			pose = filter.getGLPose(); 
 			ninja.setLocalTranslation(pose[9], pose[10], pose[11]);
 			com.jme3.math.Matrix3f rotation = new com.jme3.math.Matrix3f(pose[0], pose[1], pose[2], pose[3], pose[4], pose[5], pose[6], pose[7], pose[8]);
 			ninja.setLocalRotation(rotation);
 			
-			
 			ninja.setCullHint(CullHint.Never);
 
 		}else{
+			
 			ninja.setCullHint(CullHint.Always);
 		}
 		

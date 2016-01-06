@@ -297,6 +297,7 @@ public final class ImageDetectionFilter{
 		final	double[] sceneCorner3 =
 				mCandidateSceneCorners.get(3, 0);
 		
+		// Get the value of mCandidateSceneCorners to form a point and put into MatOfPoint2f.
 		mSceneCorners2D.fromArray(
 				new Point(sceneCorner0[0], sceneCorner0[1]),
 				new Point(sceneCorner1[0], sceneCorner1[1]),
@@ -361,7 +362,7 @@ public final class ImageDetectionFilter{
 
 
 	private void processRGBA2RGB565(Mat dst) {
-		// Change format from RGBA to RGB565.
+		// Change format from RGBA to RGB565. 
 		Imgproc.cvtColor(dst, dst, Imgproc.COLOR_BGRA2BGR565);
 		dstByteArray = new byte[(int) (dst.total() * dst.channels())];
 

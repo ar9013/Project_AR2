@@ -131,16 +131,17 @@ public class CameraAccessJMEActivity extends AndroidHarness {
 
 				processFrame(data);
 
-				mPreviewBufferRGB565 = mImageDetectionFilters[mImageDetectionFilterIndex].getDstByteArray();
+				mPreviewBufferRGB565 = mImageDetectionFilters[mImageDetectionFilterIndex].getDstByteArray(); 
+				// 取得使用 mImageDetectionFilters[mImageDetectionFilterIndex] 辨識後轉換為 ByteArray 的結果。
 
-				mPreviewByteBufferRGB565.put(mPreviewBufferRGB565);
+				mPreviewByteBufferRGB565.put(mPreviewBufferRGB565); // 將結果放到 mPreviewByteBufferRGB565 中
 
-				cameraJMEImageRGB565.setData(mPreviewByteBufferRGB565);
+				cameraJMEImageRGB565.setData(mPreviewByteBufferRGB565); // 設定 cameraJMEImageRGB565 資料
 
 				if ((com.ar4android.cameraAccessJME.CameraAccessJME) app != null) {
-					((com.ar4android.cameraAccessJME.CameraAccessJME) app).setTexture(cameraJMEImageRGB565);
+					((com.ar4android.cameraAccessJME.CameraAccessJME) app).setTexture(cameraJMEImageRGB565); //JME 設定 貼圖材質
 					((com.ar4android.cameraAccessJME.CameraAccessJME) app)
-							.setARFilter(mImageDetectionFilters[mImageDetectionFilterIndex]);
+							.setARFilter(mImageDetectionFilters[mImageDetectionFilterIndex]); 
 
 				}
 			}
@@ -295,15 +296,15 @@ public class CameraAccessJMEActivity extends AndroidHarness {
 
 	private void processFrame(byte[] data) {
 
-		Mat mData = new Mat(mPreviewHeight + mPreviewHeight / 2, mPreviewWidth, CvType.CV_8UC1);// Yuv
-																								// NV21
-		mData.put(0, 0, data);
+		Mat mData = new Mat(mPreviewHeight + mPreviewHeight / 2, mPreviewWidth, CvType.CV_8UC1); //建立空間 
+																								
+		mData.put(0, 0, data); //在建立的空間中放入 Yuv 相機影像
 
-		Mat mRgba = new Mat(mPreviewHeight + mPreviewHeight / 2, mPreviewWidth, CvType.CV_8UC4);
-		Imgproc.cvtColor(mData, mRgba, Imgproc.COLOR_YUV2BGRA_NV21, 4);
+		Mat mRgba = new Mat(mPreviewHeight + mPreviewHeight / 2, mPreviewWidth, CvType.CV_8UC4); // 建立空間以存放色彩空間轉換的結果
+		Imgproc.cvtColor(mData, mRgba, Imgproc.COLOR_YUV2BGRA_NV21, 4); //YUV2BGRA_NV21 色彩空間轉換，將結果存放到 mRgba 
 
-		mImageDetectionFilters[0].apply(mRgba, mRgba);
-		isTargetFound = mImageDetectionFilters[0].getFlagTargetFound();
+		mImageDetectionFilters[0].apply(mRgba, mRgba); // 使用 設定的 marker 當作遮照，辨識 mRgba 的轉換結果， 將辨識後的影像存到 mRgba
+		isTargetFound = mImageDetectionFilters[0].getFlagTargetFound(); // isTargetFound 存放辨識結果。
 		Log.d(TAG, "isTargetFound : " + isTargetFound);
 	}
 
