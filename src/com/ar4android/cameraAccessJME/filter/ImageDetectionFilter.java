@@ -100,6 +100,7 @@ public final class ImageDetectionFilter{
     private final MatOfDouble mRotation =
     new MatOfDouble();
     // The OpenGL pose matrix of the detected target.
+ //   private final float[] mGLPose = new float[12];
     private final float[] mGLPose = new float[12];
     
     // Whether the target is currently detected.
@@ -310,11 +311,12 @@ public final class ImageDetectionFilter{
 		// Find the target's Euler angles and XYZ coordinates.
         Calib3d.solvePnP(mReferenceCorners3D, mSceneCorners2D,
                 projection, mDistCoeffs, mRVec, mTVec);
-        
+         
         // mRVec 旋轉矩陣
         final double[] rVecArray = mRVec.toArray(); 
   
         rVecArray[0] *= -1.0;
+        
         mRVec.fromArray(rVecArray);
         
         // Convert the Euler angles to a 3x3 rotation matrix.
@@ -326,22 +328,34 @@ public final class ImageDetectionFilter{
         
         
         // 透過 旋轉、平移矩陣 描述 辨識物姿態
-        mGLPose[0] = (float)mRotation.get(0, 0)[0];
-        mGLPose[1] = (float)mRotation.get(0, 1)[0];
-        mGLPose[2] = (float)mRotation.get(0, 2)[0];
-        mGLPose[3] = (float)mRotation.get(1, 0)[0];
-        mGLPose[4] = (float)mRotation.get(1, 1)[0];
-        mGLPose[5] = (float)mRotation.get(1, 2)[0];
-        mGLPose[6] = (float)mRotation.get(2, 0)[0];
-        mGLPose[7] = (float)mRotation.get(2, 1)[0];
-        mGLPose[8] = (float)mRotation.get(2, 2)[0];
-        mGLPose[9] =   (float)tVecArray[0];
-        mGLPose[10] = -(float)tVecArray[1]; // negate y position
-        mGLPose[11] = -(float)tVecArray[2]; // negate z position
-      
-       
-        mTargetFound = true;
+//        mGLPose[0] = (float)mRotation.get(0, 0)[0];
+//        mGLPose[1] = (float)mRotation.get(0, 1)[0]; //  z軸
+//        mGLPose[2] = (float)mRotation.get(0, 2)[0]; // y軸
+//        mGLPose[3] = (float)mRotation.get(1, 0)[0]; // z軸
+//        mGLPose[4] = (float)mRotation.get(1, 1)[0];
+//        mGLPose[5] = (float)mRotation.get(1, 2)[0];
+//        mGLPose[6] = (float)mRotation.get(2, 0)[0]; // y軸 順時針
+//        mGLPose[7] = (float)mRotation.get(2, 1)[0];
+//        mGLPose[8] = (float)mRotation.get(2, 2)[0];
+//        mGLPose[9] =   (float)tVecArray[0];
+//        mGLPose[10] = -(float)tVecArray[1]; // negate y position
+//        mGLPose[11] = -(float)tVecArray[2]; // negate z position
+    
+  // 換成 int 後 模型的位置、旋轉 比較穩定。      
+        mGLPose[0] = (int)mRotation.get(0, 0)[0];
+        mGLPose[1] = (int)mRotation.get(0, 1)[0]; //  z軸
+        mGLPose[2] = (int)mRotation.get(0, 2)[0]; // y軸
+        mGLPose[3] = (int)mRotation.get(1, 0)[0]; // z軸
+        mGLPose[4] = (int)mRotation.get(1, 1)[0];
+        mGLPose[5] = (int)mRotation.get(1, 2)[0];
+        mGLPose[6] = (int)mRotation.get(2, 0)[0]; // y軸 順時針
+        mGLPose[7] = (int)mRotation.get(2, 1)[0];
+        mGLPose[8] = (int)mRotation.get(2, 2)[0];
+        mGLPose[9] =   (int)tVecArray[0];
+        mGLPose[10] = -(int)tVecArray[1]; // negate y position
+        mGLPose[11] = -(int)tVecArray[2]; // negate z position
         
+        mTargetFound = true;
 
 	}
 
@@ -376,12 +390,14 @@ public final class ImageDetectionFilter{
 	}
 	
 	
-	public float[] getGLPose() {
-		// TODO Auto-generated method stub
-		return (mTargetFound ? mGLPose : null);
-		
-	}
+
 	
+	
+	public float[] getGLPose() {
+		
+		return mGLPose;
+
+	}
 	
 	public boolean getFlagTargetFound() {
 

@@ -9,42 +9,39 @@
  */
 package com.ar4android.cameraAccessJME;
 
-import com.ar4android.cameraAccessJME.filter.CameraProjectionAdapter;
-import com.ar4android.cameraAccessJME.filter.ImageDetectionFilter;
-import com.jme3.app.AndroidHarness;
-import android.content.pm.ActivityInfo;
-import android.hardware.Camera;
-import android.hardware.Camera.Size;
-
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.List;
 
-import org.apache.http.entity.InputStreamEntity;
-import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
-import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
+import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
-import org.opencv.android.BaseLoaderCallback;
-import org.opencv.android.Utils;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.ImageFormat;
-import android.graphics.PixelFormat;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.ViewGroup;
-
+import com.ar4android.cameraAccessJME.filter.CameraProjectionAdapter;
+import com.ar4android.cameraAccessJME.filter.ImageDetectionFilter;
+import com.jme3.app.AndroidHarness;
 import com.jme3.system.android.AndroidConfigChooser.ConfigType;
 import com.jme3.texture.Image;
 
+import android.app.Fragment;
+import android.content.pm.ActivityInfo;
+import android.graphics.PixelFormat;
+import android.hardware.Camera;
+import android.hardware.Camera.Size;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.Choreographer.FrameCallback;
+import android.view.ViewGroup;
+import android.widget.Button;
+
+
 public class CameraAccessJMEActivity extends AndroidHarness {
 
+	Button btn ;
+		
 	private static final String TAG = "CameraAccessJMEActivity";
 	private Camera mCamera;
 	private CameraPreview mPreview;
@@ -207,6 +204,9 @@ public class CameraAccessJMEActivity extends AndroidHarness {
 		mouseEventsInvertX = true;
 		// Invert the MouseEvents Y (default = true)
 		mouseEventsInvertY = true;
+		
+		
+		
 	}
 
 	// We override AndroidHarness.onCreate() to be able to add the SurfaceView
@@ -214,7 +214,8 @@ public class CameraAccessJMEActivity extends AndroidHarness {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		
+		
 	}
 
 	@Override

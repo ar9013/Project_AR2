@@ -11,6 +11,7 @@ package com.ar4android.cameraAccessJME;
 
 
 
+import android.content.res.AssetManager.AssetInputStream;
 import android.renderscript.Matrix3f;
 import android.transition.Scene;
 import android.util.Log;
@@ -23,6 +24,7 @@ import com.jme3.animation.AnimControl;
 import com.jme3.animation.AnimEventListener;
 import com.jme3.animation.LoopMode;
 import com.jme3.app.SimpleApplication;
+import com.jme3.asset.AssetManager;
 import com.jme3.light.DirectionalLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
@@ -41,10 +43,11 @@ import com.jme3.texture.Texture2D;
 
 
 
-public class CameraAccessJME extends SimpleApplication implements AnimEventListener{
+public class CameraAccessJME extends SimpleApplication implements AnimEventListener {
 
 	public ImageDetectionFilter filter;
-	float[] pose = new float[12];;
+	float[] pose = new float[12];
+	
 	boolean targetFound ;
 	 Node vault = new Node("vault"); 
 	
@@ -150,8 +153,11 @@ public class CameraAccessJME extends SimpleApplication implements AnimEventListe
     	DirectionalLight sun = new DirectionalLight();
 
             ninja.scale(0.025f, 0.025f, 0.025f);
-            ninja.rotate(0.0f, -3.0f, 0.0f);
-            ninja.setLocalTranslation(0.0f, -2.5f, 0.0f);
+            ninja.setCullHint(CullHint.Never);
+          //  ninja.rotate(0.0f, -3.0f, 0.0f);
+          //  ninja.setLocalTranslation(0.0f, -2.5f, 0.0f);
+            
+            targetFound = true;
             
             // You must add a light to make the model visible
             sun.setDirection(new Vector3f(-0.1f, -0.7f, -1.0f));
@@ -167,7 +173,7 @@ public class CameraAccessJME extends SimpleApplication implements AnimEventListe
             nodeNinja.attachChild(ninja);
             nodeNinja.addLight(sun);
             
-            
+           
             
         	rootNode.attachChild(nodeNinja);
         	
@@ -223,18 +229,23 @@ public class CameraAccessJME extends SimpleApplication implements AnimEventListe
 		
 	
 		if(targetFound){
-			// 角色更新的參數有問題。
+			// 角色更新的參數有問題。需要重新設定數值。
 			pose = filter.getGLPose(); 
-			ninja.setLocalTranslation(pose[9], pose[10], pose[11]);
 			com.jme3.math.Matrix3f rotation = new com.jme3.math.Matrix3f(pose[0], pose[1], pose[2], pose[3], pose[4], pose[5], pose[6], pose[7], pose[8]);
+			ninja.setLocalTranslation(pose[9], pose[10], pose[11]); // X,Y,Z 座標
+			
 			ninja.setLocalRotation(rotation);
 			
-			ninja.setCullHint(CullHint.Never);
+			ninja.setCullHint(CullHint.Dynamic); // 在截斷的金字塔外面時，不會顯示忍者。
 
 		}else{
-			
 			ninja.setCullHint(CullHint.Always);
+			// 清掉 pose 陣列的值
+			for(int poseIndex = 1;poseIndex < pose.length; poseIndex++ ){
+				pose[poseIndex] = 0.0f;
+			}
 		}
+		targetFound =filter.getFlagTargetFound();
 		
 		// we have to update the video background node before the root node gets updated by the super class
 		mVideoBGGeom.updateLogicalState(tpf);
@@ -260,13 +271,5 @@ public class CameraAccessJME extends SimpleApplication implements AnimEventListe
 
 	public void setARFilter(ImageDetectionFilter arFilter) {
 		filter = arFilter;
-		targetFound =filter.getFlagTargetFound();
-		
-//		if(targetFound){
-//		pose = filter.getGLPose();
-//		com.jme3.math.Matrix3f rotation = new com.jme3.math.Matrix3f(pose[0], pose[1], pose[2], pose[3], pose[4], pose[5], pose[6], pose[7], pose[8]);
-//		ninja.setLocalRotation(rotation);
-//        ninja.setLocalTranslation(pose[9], pose[10], pose[11]);
-//		}
 	}
 }

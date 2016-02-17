@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+
     <string name="app_name">CameraAccessJME</string>
+    <string name="title_activity_home">HomeActivity</string>
+    <string name="hello_world">Hello world!</string>
+
 </resources>
